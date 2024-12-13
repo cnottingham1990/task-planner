@@ -14,6 +14,12 @@ function TaskPlanner() {
         }
     })));
 
+    const [unforeseenTasks, setUnforeseenTasks] = React.useState(Array(5).fill(null).map((_, index) => ({
+        id: index + 1,
+        description: '',
+        hours: ''
+    })));
+
     const [userInfo, setUserInfo] = React.useState({
         name: '',
         email: '',
@@ -32,6 +38,12 @@ function TaskPlanner() {
         setTasks(newTasks);
     }
 
+    function updateUnforeseenTask(index, field, value) {
+        const newTasks = [...unforeseenTasks];
+        newTasks[index] = { ...newTasks[index], [field]: value };
+        setUnforeseenTasks(newTasks);
+    }
+
     function calculateDailyTotal(day) {
         return tasks.reduce((sum, task) => {
             const hours = parseFloat(task.dailyHours[day]) || 0;
@@ -48,6 +60,16 @@ function TaskPlanner() {
         }, 0).toFixed(1);
     }
 
+    function calculateUnforeseenTotal() {
+        return unforeseenTasks.reduce((sum, task) => {
+            return sum + (parseFloat(task.hours) || 0);
+        }, 0).toFixed(1);
+    }
+
+    function calculateGrandTotal() {
+        return (parseFloat(calculateWeeklyTotal()) + parseFloat(calculateUnforeseenTotal())).toFixed(1);
+    }
+
     async function handleSubmit() {
         if (!userInfo.name || !userInfo.email || !userInfo.managerEmail) {
             alert('Please fill in your name, email, and manager\'s email before submitting.');
@@ -57,8 +79,11 @@ function TaskPlanner() {
         const data = {
             userInfo,
             tasks,
+            unforeseenTasks,
             totals: {
                 weeklyTotal: calculateWeeklyTotal(),
+                unforeseenTotal: calculateUnforeseenTotal(),
+                grandTotal: calculateGrandTotal(),
                 dailyTotals: days.reduce((acc, day) => ({
                     ...acc,
                     [day]: calculateDailyTotal(day)
@@ -89,6 +114,8 @@ function TaskPlanner() {
                 e('h1', { className: 'text-2xl font-bold' }, 'Weekly Task Planner'),
                 e('p', { className: 'text-gray-600' }, '* Include all work that requires a minimum of .5 hours')
             ),
+            
+            // Main Tasks Table
             e('table', { className: 'w-full border-collapse mb-6' },
                 e('thead', null,
                     e('tr', { className: 'bg-gray-50' },
@@ -169,6 +196,43 @@ function TaskPlanner() {
                     )
                 )
             ),
+
+            // Unforeseen Tasks Table
+            e('h2', { className: 'text-xl font-bold mt-8 mb-4' }, 'Unforeseen Tasks'),
+            e('table', { className: 'w-full border-collapse mb-6' },
+                e('thead', null,
+                    e('tr', { className: 'bg-gray-50' },
+                        e('th', { className: 'border p-2' }, '#'),
+                        e('th', { className: 'border p-2' }, 'Unforeseen Task Description'),
+                        e('th', { className: 'border p-2' }, 'Hours')
+                    )
+                ),
+                e('tbody', null,
+                    unforeseenTasks.map((task, index) => 
+                        e('tr', { key: `unforeseen-${index}` },
+                            e('td', { className: 'border p-2' }, task.id),
+                            e('td', { className: 'border p-2' },
+                                e('input', {
+                                    type: 'text',
+                                    className: 'w-full p-1 border rounded',
+                                    value: task.description,
+                                    onChange: (e) => updateUnforeseenTask(index, 'description', e.target.value)
+                                })
+                            ),
+                            e('td', { className: 'border p-2' },
+                                e('input', {
+                                    type: 'number',
+                                    className: 'p-1 border rounded',
+                                    value: task.hours,
+                                    onChange: (e) => updateUnforeseenTask(index, 'hours', e.target.value)
+                                })
+                            )
+                        )
+                    )
+                )
+            ),
+
+            // Totals Section
             e('div', { className: 'grid grid-cols-3 gap-4 mb-6' },
                 e('div', { className: 'bg-gray-50 p-4 rounded' },
                     e('div', { className: 'text-sm font-medium' }, 'Total Weekly Hours'),
@@ -178,15 +242,19 @@ function TaskPlanner() {
                 ),
                 e('div', { className: 'bg-gray-50 p-4 rounded' },
                     e('div', { className: 'text-sm font-medium' }, 'Unforeseen Hours'),
-                    e('div', { className: 'text-2xl font-bold text-blue-600' }, '0')
+                    e('div', { className: 'text-2xl font-bold text-blue-600' },
+                        calculateUnforeseenTotal()
+                    )
                 ),
                 e('div', { className: 'bg-gray-50 p-4 rounded' },
                     e('div', { className: 'text-sm font-medium' }, 'Grand Total Hours'),
                     e('div', { className: 'text-2xl font-bold text-blue-600' },
-                        calculateWeeklyTotal()
+                        calculateGrandTotal()
                     )
                 )
             ),
+
+            // User Info Section
             e('div', { className: 'bg-gray-50 p-4 rounded' },
                 e('div', { className: 'grid grid-cols-3 gap-4 mb-4' },
                     e('div', null,
