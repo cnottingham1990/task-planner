@@ -21,6 +21,7 @@ function TaskPlanner() {
     })));
 
     const [userInfo, setUserInfo] = React.useState({
+        date: new Date().toISOString().split('T')[0], // Sets today's date as default
         name: '',
         email: '',
         managerEmail: ''
@@ -71,8 +72,8 @@ function TaskPlanner() {
     }
 
     async function handleSubmit() {
-        if (!userInfo.name || !userInfo.email || !userInfo.managerEmail) {
-            alert('Please fill in your name, email, and manager\'s email before submitting.');
+        if (!userInfo.name || !userInfo.email || !userInfo.managerEmail || !userInfo.date) {
+            alert('Please fill in all required fields (name, email, manager\'s email, and date) before submitting.');
             return;
         }
 
@@ -111,7 +112,18 @@ function TaskPlanner() {
     return e('div', { className: 'container mx-auto px-4 py-8' },
         e('div', { className: 'bg-white rounded-lg shadow-lg p-6' },
             e('div', { className: 'mb-6' },
-                e('h1', { className: 'text-2xl font-bold' }, 'Weekly Task Planner'),
+                e('div', { className: 'flex justify-between items-center mb-4' },
+                    e('h1', { className: 'text-2xl font-bold' }, 'Weekly Task Planner'),
+                    e('div', { className: 'flex items-center' },
+                        e('label', { className: 'mr-2 font-medium' }, 'Week Starting:'),
+                        e('input', {
+                            type: 'date',
+                            className: 'p-2 border rounded',
+                            value: userInfo.date,
+                            onChange: (e) => setUserInfo({...userInfo, date: e.target.value})
+                        })
+                    )
+                ),
                 e('p', { className: 'text-gray-600' }, '* Include all work that requires a minimum of .5 hours')
             ),
             
