@@ -77,6 +77,14 @@ function TaskPlanner() {
             return;
         }
 
+        // Convert boolean values to Yes/No before sending
+        const formattedTasks = tasks.map(task => ({
+            ...task,
+            isMandatory: task.isMandatory ? "Yes" : "No",
+            isComplete: task.isComplete ? "Yes" : "No",
+            isDeferred: task.isDeferred ? "Yes" : "No"
+        }));
+
         const data = {
             userInfo,
             tasks,
