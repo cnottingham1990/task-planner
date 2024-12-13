@@ -14,7 +14,7 @@ function TaskPlanner() {
         }
     })));
 
-    const [unforeseenTasks, setUnforeseenTasks] = React.useState(Array(5).fill(null).map((_, index) => ({
+    const [unforeseenTasks, setUnforeseenTasks] = React.useState(Array(20).fill(null).map((_, index) => ({
         id: index + 1,
         description: '',
         hours: ''
