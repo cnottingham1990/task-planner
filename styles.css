@@ -1,0 +1,16 @@
+.task-row-yellow {
+    background-color: rgba(253, 230, 138, 0.2);
+}
+
+.task-row-green {
+    background-color: rgba(167, 243, 208, 0.2);
+}
+
+input[type="number"] {
+    width: 70px;
+}
+
+.checkbox-cell {
+    width: 100px;
+    text-align: center;
+}
